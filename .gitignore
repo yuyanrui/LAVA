@@ -1,0 +1,9 @@
+*.jpg
+outputs/
+*.pyc
+*.npy
+*.pkl
+*.pth
+*.mp4
+vehicle_reid/logs
+*output*/
