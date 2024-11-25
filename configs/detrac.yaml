@@ -1,0 +1,36 @@
+video_name: detrac
+full_name: Taipei_Hires
+dataset_group: blazeit
+classes: ["red car"]
+w: 960
+h: 540
+seed: 100
+start_frame: 0
+end_frame: 3860
+fps: 30
+skip_frames: 20
+max_gap_time: 8
+min_gap_time: 3
+sample_num: 5
+
+traj_dist_min: 100 
+thresh_len: 45     
+max_len: 600       
+dis_thresh: 1600    
+difference_thresh: 0.001 
+differ_abs_thresh: 96
+
+iou_thresh: 0.5
+conf_thresh: 0.3
+stop_iou_thresh: 0.7
+intersect_overlap_thresh: 0.5
+image_thresh_score: 0.99
+reid_thresh: 0.25
+ignore_region: [[380, 170, 437, 204],[1180, 230, 1204, 294],[317, 184, 366, 215],[560, 130, 636, 166]]
+stop_area : [[0, 382, 960, 540], [0, 90, 210, 325], [680, 0, 875, 70],[750, 55, 960, 370]]
+
+car_count: 3
+truck_count: 1
+bus_count: 2
+
+traffic_light: 30 

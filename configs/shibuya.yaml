@@ -1,0 +1,33 @@
+video_name: shibuya 
+full_name: shibuya
+dataset_group: blazeit
+w: 960
+h: 540
+seed: 100
+start_frame: 0   
+end_frame: 30990
+fps: 10
+skip_frames: 40    
+max_gap_time: 5    
+min_gap_time: 2
+sample_num: 5    
+
+traj_dist_min: 60  
+thresh_len: 15     
+max_len: 200       
+dis_thresh: 1800   
+difference_thresh: 0.0001 
+differ_abs_thresh: 64
+
+iou_thresh: 0.5              
+conf_thresh: 0.25            
+stop_iou_thresh: 0.7         
+intersect_overlap_thresh: 0.7 
+image_thresh_score: 0.99
+reid_thresh: 0.7      
+ignore_region: []
+stop_area : [[85,255,217,408],[217,170,425,229],[501,160,633,240],[531,346,720,480]]
+
+car_count: 3
+truck_count: 2
+bus_count: 2

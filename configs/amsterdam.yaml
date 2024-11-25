@@ -1,0 +1,36 @@
+video_name: warsaw
+full_name: Taipei_Hires
+dataset_group: blazeit
+classes: ["bus with single-section design"]
+w: 960
+h: 540
+seed: 100
+start_frame: 0
+end_frame: 30000
+fps: 10
+skip_frames: 20
+max_gap_time: 8
+min_gap_time: 3
+sample_num: 5
+
+traj_dist_min: 100 
+thresh_len: 45     
+max_len: 600       
+dis_thresh: 1600    
+difference_thresh: 0.001 
+differ_abs_thresh: 96
+
+iou_thresh: 0.5
+conf_thresh: 0.3
+stop_iou_thresh: 0.7
+intersect_overlap_thresh: 0.5
+image_thresh_score: 0.99
+reid_thresh: 0.7
+ignore_region: []
+stop_area : [[0,150,280,360],[360,90,590,260],[0,470,1100,720],[1050,260,1280,480]]
+
+car_count: 3
+truck_count: 1
+bus_count: 2
+
+traffic_light: 30 
