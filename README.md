@@ -1,10 +1,10 @@
-# Lava: Trajectory-Based Query Optimization for Open-Vocabulary Video Analytics
+# Lava: Language Driven Efficient Video Analytics
 
 Yanrui Yu, Tianfei Zhou, Jiaxin Sun, Lianpeng Qiao, Ye Yuan
 
 ## Overview
 
-This repository contains the implementation of the paper **"Lava: Trajectory-Based Query Optimization for Open-Vocabulary Video Analytics"**, which is currently under submission to **ICDE 2025**.
+This repository contains the implementation of the paper **"Lava: Language Driven Efficient Video Analytics"**, which is currently under submission to **ICDE 2025**.
 
 
 ## Abstract
