@@ -22,7 +22,7 @@ if [ -d "$DIR" ]; then
     echo "Evaluating model"
     echo "Results are available in ${DIR}. Resuming..."
 
-    python pipline/sample_query.py \
+    python pipline/lava_query.py \
     --root ${DATA} \
     --seed ${SEED} \
     --config ./configs/${DATASET}.yaml \
@@ -40,7 +40,7 @@ else
     echo "Evaluating model"
     echo "Runing the first phase job and save the output to ${DIR}"
 
-    python pipline/sample_query.py \
+    python pipline/lava_query.py \
     --root ${DATA} \
     --seed ${SEED} \
     --config ./configs/${DATASET}.yaml \
