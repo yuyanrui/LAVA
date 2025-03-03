@@ -1,6 +1,6 @@
 # Lava: Language Driven Efficient Video Analytics
 
-Yanrui Yu, Tianfei Zhou, Jiaxin Sun, Lianpeng Qiao, Ye Yuan
+Yanrui Yu, Tianfei Zhou, Jiaxin Sun, Lianpeng Qiao, Ye Yuan, and Guoren Wang
 
 ## Overview
 
