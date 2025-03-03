@@ -27,12 +27,6 @@ from torchvision import transforms
 from tqdm import tqdm
 from PIL import Image
 
-# 首先要加载轨迹聚类的结果
-# 随后根据聚类的结果匹配当前轨迹的长度、给每辆车分配一个 id，对于每辆车，根据匹配的轨迹的长度，平均采样 n 帧，做车辆的 reid 匹配
-
-# 使用 np 读取 npy 文件
-# 轨迹聚类的结果
-# 读取聚类结果
 def getYaml(file_path):
     with open(file_path) as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
@@ -146,8 +140,7 @@ def process_detect_results(current_frame, current_image, results, tracks, traine
     
     n = cfg['sample_num']
     
-    # 给定每个 bbox，匹配最近的轨迹，确定需要采样的后续 n 帧序列
-    if current_frame == cfg['start_frame']:# 这里也要用 clip_scores进行错检筛选
+    if current_frame == cfg['start_frame']:
         for box in results[0].boxes:
             apply_id = max(video_details.resolved_tuple.keys()) + 1 \
             if len(video_details.resolved_tuple) != 0 else 1
@@ -162,7 +155,6 @@ def process_detect_results(current_frame, current_image, results, tracks, traine
             
             video_details.resolved_tuple[apply_id] = [[[x1, y1, x2, y2, current_frame, current_image]], match_traj_dict, [car_image], {}] # 要不要存储当前的间隔 
     else:
-        # 遍历per_car_sample, 如果采样到了当前的帧，就做一个匹配，并修正轨迹
         per_car_sample = video_details.per_car_sample.copy()
         for box in results[0].boxes: 
             x1, y1, x2, y2 = box.xyxy[0].cpu().numpy().tolist()
@@ -172,17 +164,14 @@ def process_detect_results(current_frame, current_image, results, tracks, traine
             if clip_score == 0:
                 continue
             # cv2.imwrite(f"outputs/detrac_cut_red_car/{current_frame}_{x1}_{x2}_{y1}_{y2}.jpg", car_image)
-            # 进行轨迹匹配
             match_traj_dict = get_point_update([x1, y1, x2, y2], tracks, cfg)
             match_flag = False
             for car_id, frame_list_and_interval in video_details.per_car_sample.items():
                 if current_frame in frame_list_and_interval[0]:
-                    # 进行 reid 匹配，需要对car_id下的前一帧进行 reid 匹配
                     if len(video_details.resolved_tuple[car_id][0]) != 0:
                         # reid_score = extractor.similarity(car_image, video_details.resolved_tuple[car_id][2][-1])
                         # clip_score = clip_scoring(trainer, car_image)
                         reid_score = clip_reid(trainer, car_image, video_details.resolved_tuple[car_id][2][-1])
-                        # 如果匹配上了，则加入到resolved_tuple中
                         if reid_score > cfg['reid_thresh']:
                             video_details.resolved_tuple[car_id][0].append([x1, y1, x2, y2, current_frame, current_image])
                             video_details.resolved_tuple[car_id][2].append(car_image)
@@ -193,33 +182,19 @@ def process_detect_results(current_frame, current_image, results, tracks, traine
                                     continue
                             else:
                                 video_details.resolved_tuple[car_id][3][current_frame] = reid_score                                
-                            # 修正轨迹, 更新resolved_tuple[car_id][1] 即 match_traj_dict,
                             match_intersect = justify_intersect(video_details.resolved_tuple[car_id][1], match_traj_dict)# 这里需要根据n个轨迹的结果来做
                             if match_intersect:
                                 # video_details.resolved_tuple[car_id][1] = {match_intersect[0]:match_traj_dict[match_intersect[0]]}
                                 video_details.resolved_tuple[car_id][1] = match_intersect
-                                # 更新per_car_sample
                                 exist_num = len(video_details.resolved_tuple[car_id][0])
                                 per_car_sample[car_id] = get_sample_gap_n(current_frame, tracks, match_intersect, n-exist_num, cfg, video_details) # 不能在遍历的时候改变字典的大小，保留备份，最后再更新。
                             match_flag = True
                             break
-                # 确认是否是新的车出现, 逻辑错误，这里只是当前carid没有匹配上，并不是所有carid没有匹配上
                 elif  frame_list_and_interval[1][0]< current_frame <frame_list_and_interval[1][1]:
-                    # 这里是匹配不上的，才算是新的, 新车直接添加到resolved_tuple中，旧车就先pass，后续可以对旧车进行处理，辅助识别的效果
-                    # reid_score = extractor.similarity(car_image, video_details.resolved_tuple[car_id][2][-1])
                     reid_score = clip_reid(trainer, car_image, video_details.resolved_tuple[car_id][2][-1])
-                    # clip_score = clip_scoring(trainer, car_image)
                     if reid_score > cfg['reid_thresh']:
                         match_flag = True
                         break
-                
-                #     # apply_id += 1
-                #     if reid_score < cfg['reid_thresh']:# 这个判断是为了筛选出新车
-                #         apply_id = max(video_details.resolved_tuple.keys()) + 1 \
-                #         if len(video_details.resolved_tuple) != 0 else 1
-                #         per_car_sample[apply_id] = get_sample_gap_n(current_frame, tracks, match_traj_dict, n-1, cfg)
-                #         video_details.resolved_tuple[apply_id] = [[[x1, y1, x2, y2, current_frame, current_image]], match_traj_dict, [car_image], []]
-                #     break
             if not match_flag:
                 apply_id = max(video_details.resolved_tuple.keys()) + 1 \
                 if len(video_details.resolved_tuple) != 0 else 1
@@ -228,8 +203,6 @@ def process_detect_results(current_frame, current_image, results, tracks, traine
         
         video_details.per_car_sample = per_car_sample    
     next_frame = get_next_frame(current_frame)
-    # if next_frame == 154:
-    #     print("debug")
     return next_frame
 
 def main(args, video_path, cluster_result_path, detect_object, trainer, cfg):
@@ -244,11 +217,6 @@ def main(args, video_path, cluster_result_path, detect_object, trainer, cfg):
     stop_region = cfg['stop_area']
     allocate_tracks(tracks, stop_region)
     
-    # extractor = feature_extractor(cfg['w'], cfg['h'])
-    # extractor.init_extractor()
-    
-    # 从头开始读取视频
-    # videoCapture = cv2.VideoCapture(video_path)
     images = os.listdir(video_path)
     images.sort()
     images = [os.path.join(video_path, image_name) for image_name in images]
@@ -260,12 +228,8 @@ def main(args, video_path, cluster_result_path, detect_object, trainer, cfg):
         mask_image = cv2.imread("./masks/"+cfg["video_name"]+"_mask.jpg", cv2.IMREAD_GRAYSCALE)
     
     while current_frame < cfg['end_frame']:
-    # while current_frame < 300:
         decode_time = time.time()
-        # videoCapture.set(cv2.CAP_PROP_POS_FRAMES, current_frame)
-        # success, current_image = videoCapture.read()
         current_image = cv2.imread(images[current_frame])
-        # original_image = current_image.copy()
         video_details.background_img = current_image
         video_details.decode_time += time.time() - decode_time
         
@@ -278,7 +242,7 @@ def main(args, video_path, cluster_result_path, detect_object, trainer, cfg):
             exit()
 
         if args.use_filter:
-            if video_details.blank_frame: #这里的逻辑完善一下，如果为空，那就跳过很多帧，加速处理
+            if video_details.blank_frame: 
                 differ_time = time.time()
                 difference_score = frame_difference_score(current_image, video_details.history_frame, cfg["differ_abs_thresh"])
                 video_details.frame_differencer_time += time.time() - differ_time
@@ -294,7 +258,6 @@ def main(args, video_path, cluster_result_path, detect_object, trainer, cfg):
                     continue
         
         detect_time = time.time()
-        # yolo world或者 grounding dino
         results = detect_object.predict(current_image)
         video_details.detector_time += time.time() - detect_time
         print("-------frame________:", current_frame)
@@ -317,11 +280,6 @@ def main(args, video_path, cluster_result_path, detect_object, trainer, cfg):
         current_frame = next_frame
     
     return video_details.frame_sampled, video_details.resolved_tuple
-        # 这里进行匹配，决定采样的帧数
-        # 1. 给当前检测结果（每个 bbox）都匹配最接近的轨迹
-        # 2. 对于每个轨迹，根据匹配的轨迹的长度，平均采样 n 帧
-        # 3. 对于每个采样的帧，进行 reid 匹配 怎么才能个 bbox 采样 n 帧？
-        # 4. 对于每个 bbox，匹配最近的轨迹，确定需要采样的后续n 帧序列，依次处理 n 帧，进行目标检测，reid 匹配，处理完当前帧的所有 bbox 之后，选择所有 bbox 中轨迹最短的一个，确定下一帧的采样位置
 
 def covert_entity_to_frame():
     frame_level_result = {}
@@ -347,7 +305,6 @@ def make_trainer(args):
     trainer.load_model(args.model_dir, epoch=args.load_epoch)
     
     return trainer, cfg
-    # 测试clip 是否可以用于 reid，如果可以，那省好多事儿啊， 根据 track_id 选择相同的和不同的，测试
 
 def clip_reid(trainer, np_img1, np_img2):
     transform = transforms.Compose([
@@ -372,13 +329,6 @@ def clip_scoring(trainer, img):
 
 def test_clip_reid(args, cfg1):
     trainer, cfg = make_trainer(args)
-    # clip
-    # transform = transforms.Compose([
-    #         transforms.Resize((224, 224)),
-    #         transforms.ToTensor(),
-    #         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-    #     ])
-    # reid
     transform = transforms.Compose([
             transforms.Resize((256, 256)),
             transforms.ToTensor(),
@@ -402,7 +352,6 @@ def test_clip_reid(args, cfg1):
         del img2
         del label
         del similarity
-        # 尝试释放显存
         torch.cuda.empty_cache()
     
     print("Similarities: ", similarities)
@@ -416,15 +365,13 @@ if __name__ == "__main__":
     trainer, cfg_dassl = make_trainer(args)
     
     video_path = os.path.join(args.root, args.dataset_name, args.split, 'image')
-    # cluster_result_path = "fixed_files/preprocessed/caldot1/caldot1_0_0_tracks_clustered.npy"
     cluster_result_path = f'fixed_files/preprocessed/{args.dataset_name}/{args.dataset_name}.npy'
-    # 从 config 中读取，存到一个固定的地方
     chunk_path = os.path.join('sample_output', args.dataset_name, args.query, args.split, 'chunk.json')
     model = YOLO(args.yolo_weight)
     video_details.read_chunks_frame(chunk_path)
     
     frame_sampled, resolved_tuple = main(args, video_path, cluster_result_path, model, trainer, cfg)
-    # 使用pickle保存video_details
+    
     save_path = os.path.join('query_output', args.dataset_name, args.query, args.split)
     import pickle
     if not os.path.exists(save_path):
@@ -450,8 +397,6 @@ if __name__ == "__main__":
     overlap_rate = evaluate_object.top_k_query_1()
     save_dict['Topk query'] = [overlap_rate]
     print("Topk query: overlap_rate:%5f"%(overlap_rate))
-    # GT_COUNT,PRED_COUNT = evaluate_object.aggregation_query_3()
-    # print("Aggregation_query: GT_COUNT:%5f, PRED_COUNT:%5f"%(GT_COUNT,PRED_COUNT))
+
     with open(os.path.join('query_output', args.dataset_name, args.query, args.split, 'query_result.json'), "w") as f:
         json.dump(save_dict, f)
-    # 为什么还是[11 61]?
