@@ -1,14 +1,15 @@
-# Lava: Language Driven Efficient Traffic Video Analytics
+# LAVA: Language Driven Efficient Traffic Video Analytics
 
-Yanrui Yu, Tianfei Zhou, Jiaxin Sun, Lianpeng Qiao, Ye Yuan, and Guoren Wang
+Yanrui Yu, Tianfei Zhou, Jiaxin Sun, Lianpeng Qiao, Lizhong Ding, Ye Yuan, and Guoren Wang
+
+## News
+
+- [2025/07/25] Our paper was accepted at **ACM Multimedia 2025 (MM '25)**, and we have released the code on [GitHub]((https://github.com/yuyanrui/Lava))!
 
 ## Overview
-
-This repository contains the implementation of the paper **"Lava: Language Driven Efficient Traffic Video Analytics"**, which is currently under submission to **IEEE Transactions on Knowledge and Data Engineering**.
-
-## Abstract
-Video analytics has become crucial for processing massive volumes of traffic video in modern urban infrastructures. However, existing methods are limited by either predefined categories that restrict query flexibility or a lack of support for complex query types such as object-level aggregation and selection. Language-driven video analytics offers expressiveness and adaptability but faces challenges including sparsely distributed targets and low accuracy in dynamic, real-world traffic scenarios. Additionally, the lack of semantically rich and diverse benchmark datasets further hinders the evaluation and development of such systems.  To tackle these challenges, we propose Lava, a language-driven video analytics system tailored for traffic videos. Lava supports natural language queries to retrieve semantically rich traffic information, enabling diverse query types such as selection, aggregation, and top-k across multiple levels of granularity, from frame-level analysis to object-specific statistics. By efficiently localizing relevant segments, integrating semantic filtering, and leveraging temporal relationships, Lava minimizes computational overhead while maintaining high accuracy. To enable comprehensive evaluation, we develop a benchmark with diverse, semantically rich natural language predicates and fine-grained annotations across multiple datasets. Experiments on this benchmark demonstrate that Lava improves $F_1$-scores for selection queries by 15%, reduces MPAE for aggregation queries by 0.39, and achieves top-k precision of 86%, while processing videos 9.6× faster than the most accurate baseline.
-
+In modern urban environments, camera networks generate massive amounts of operational footage -- reaching petabytes each day -- making scalable video analytics essential for efficient processing.  Many existing approaches adopt an SQL-based paradigm for querying such large-scale video databases; however, this constrains queries to rigid patterns with predefined semantic categories,  significantly limiting analytical flexibility.  In this work, we explore a  language-driven video analytics paradigm aimed at enabling flexible and efficient querying of high-volume video data driven by natural language. Particularly, we build LAVA, a system that accepts natural language queries and  retrieves traffic targets across multiple levels of granularity and arbitrary categories.LAVA comprises three main components: 1) a multi-armed bandit-based efficient sampling method for video segment-level localization;
+ 2) a video-specific open-world detection module for object-level retrieval; and 3) a long-term object trajectory extraction scheme for temporal object association, yielding complete trajectories for object-of-interests. To support comprehensive evaluation, we further develop a novel benchmark by providing diverse, semantically rich natural language predicates and fine-grained annotations for multiple videos. Experiments on this benchmark demonstrate that LAVA improves $F_1$-scores for selection queries by $\mathbf{14\%}$, reduces MPAE for aggregation queries by $\mathbf{0.39}$, and achieves top-$k$ precision of $\mathbf{86\%}$, while processing videos $ \mathbf{9.6\times} $ faster than the most accurate baseline. 
+ 
 ## Installation
 
 To run this code, you will need Python 3.8 and the following dependencies:
@@ -36,3 +37,7 @@ pip install -r requirements.txt
 ```bash
  bash scripts/pipline.sh $DATASET $PREDICATE
 ```
+### Dataset
+
+```bash
+The dataset will be released soon. Stay tuned!
