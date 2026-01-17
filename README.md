@@ -50,5 +50,7 @@ pip install -r requirements.txt
 ```
 ### Dataset
 
-```bash
-The dataset will be released soon. Stay tuned!
+The LAVA Dataset is now officially released on HuggingFace! You can access the complete dataset (including video files, annotation files, and usage guides) via the following link:  
+https://huggingface.co/datasets/xiaoyu123hhh/Lava_Dataset
+
+The dataset covers 6 locations (amsterdam, caldot1, caldot2, jackson, shibuya, warsaw), with separate `train` and `test` splits. Each split includes MP4 videos, corresponding `label.json` annotation files, and supports frame extraction & bounding box visualization through the provided scripts. For detailed usage (e.g., frame extraction, annotation parsing, and visualized examples), please refer to the dataset documentation on the HuggingFace page.
