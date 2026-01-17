@@ -75,10 +75,3 @@ def make_trainer():
     trainer.load_model(args.model_dir, epoch=args.load_epoch)
     
     return trainer, args
-
-
-# trainer, _ = make_trainer()
-# image = Image.open("/data/usrs/yyr/datasets/lava_dataset/warsaw/test/image/frame_000001.jpg")
-# preds = trainer.judge_pic(image)
-# print("make_trainer() is OK")
-# 写一个脚本，根据数据集，seed，自动确定 model_dir,参考 test.sh如何写
