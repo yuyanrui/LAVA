@@ -37,14 +37,11 @@ def covert_entity_to_frame(video_details):
 def convert_label2int(s):
     start_index = len(s) - 1
 
-    # 检查字符串中的每个字符，直到找到一个非数字字符
     while start_index >= 0 and s[start_index].isdigit():
         start_index -= 1
 
-    # 计算数字部分的起始位置
     start_index += 1
 
-    # 提取数字部分并转换为整数
     number = int(s[start_index:])
     return number
 
@@ -58,19 +55,17 @@ def convert_json_to_label(json_file):
         frame_level_result[frame] = input_label[key]
     return frame_level_result
 if __name__ == "__main__":
-    # 使用pickle保存video_details
+
     parser = make_parser()
     args = parser.parse_args()
     cfg = getYaml(args.config)
     
     import pickle
-    # with open("video_details_warsaw_reid_threshold_0.25.pkl", "rb") as f:
-        # video_details = pickle.load(f)
     
     evaluate_object = evaluation("red_car_label", cfg)
     with open("/home/yyr/yu88/CLIP_Surgery/background_subtraction/red_car_label_count.json","r") as f:
         input_label = json.load(f)
-    # frame_level_result = covert_entity_to_frame(video_details)
+
     frame_level_result = convert_json_to_label("/home/yyr/yu88/CLIP_Surgery/warsaw1_red_car.json")
     evaluate_object.preprocess(input_label, frame_level_result)
     F1,recall,precision,accuracy = evaluate_object.selection_query_1()
